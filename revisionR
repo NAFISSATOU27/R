@@ -1,0 +1,168 @@
+### projet rectorat
+
+
+# installation des packages
+install.packages("read_excel")
+install.packages("dplyr")
+getwd()
+
+
+read_excel("Rectorat.xlsx")
+
+str(baseetudrec) # voir la nature des variables
+
+# suppresion de la variable L_MOTF_SORT_SOC qui à la 4ième colonne car il y'a deux champs de meme nature dans la basetel que MOTIF
+baseetudrec=baseetudrec[,-4]
+
+##transformation de certains varaiables en facteurs
+
+baseetudrec$ZONEGEOGRAPHIQUE=as.factor(baseetudrec$ZONEGEOGRAPHIQUE)
+baseetudrec$L_DIPL=as.factor(baseetudrec$L_DIPL)
+baseetudrec$MOTIF=as.factor(baseetudrec$MOTIF)
+baseetudrec$L_ROLE=as.factor(baseetudrec$L_ROLE)
+baseetudrec$L_AFFECT_1=as.factor(baseetudrec$L_AFFECT_1)
+baseetudrec$ANNEE=as.factor(baseetudrec$ANNEE)
+baseetudrec$TYPE_MVT=as.factor(baseetudrec$TYPE_MVT)
+baseetudrec$SEXE=as.factor(baseetudrec$SEXE)
+baseetudrec$ANNEE=as.factor(baseetudrec$ANNEE)
+baseetudrec$MOIS=as.factor(baseetudrec$MOIS)
+baseetudrec$vacant=as.factor(baseetudrec$vacant)
+baseetudrec$MATRICULE=as.factor(baseetudrec$MATRICULE)
+
+
+
+
+## transformation de la variable d_fin_cc en date , ici le format est posixct
+
+# pour voir quelle est le format date du syst?me
+today=Sys.Date()
+today
+##now("Europe/Paris")
+##OlsonNames()
+format(today,"%d/%m/%Y")
+
+baseetudrec$D_FIN_CTT=as.Date(baseetudrec$D_FIN_CTT,"%d/%m/%Y") 
+
+##### ## y'a t'il des valeurs manquantes
+any(is.na(baseetudrec)) 
+
+# pour voir les variables ou se trouvent les valeurs manquantes
+summary (baseetudrec) 
+
+## ou se trouve les données manquantes
+which(is.na(baseetudrec)) 
+
+## si je voulais les supprimer baseetudrect %>% filter(!is.na(baseetudrec))
+
+
+
+
+
+
+## ##########################################dataviz 
+
+## treemap des nombres de départs les départs
+install.packages("treemap")
+install.packages("treemapify")
+install.packages("questionr")
+install.packages("FREQ")
+install.packages("plotrix")
+library(treemap)
+library(treemapify)
+library(dplyr)
+library(questionr)
+library(ggplot2)
+library(plotrix)
+
+
+## ###############################""Analyser des variables les variables qualitatifs #################
+
+
+table(baseetudrec$MOTIF)
+freq(baseetudrec$MOTIF)
+
+barplot(table(baseetudrec$MOTIF),col="skyblue") ## histogramme
+
+table(baseetudrec$SEXE)
+barplot(table(baseetudrec$SEXE),col="red")
+
+df=as.data.frame(table(baseetudrec$MOTIF)) ## tranformation en data framme
+df
+mode(df)
+
+
+
+
+pie(df$FREQUENCE,labels=df$DEPART)
+
+colnames(df)=c('DEPART','FREQUENCE')
+
+?ggplot
+## treemap
+bg=baseetudrec%>%
+  group_by(ANNEE)%>%
+  count(ANNEE)%>%
+  rename(TYPE_MVT=n)
+
+treemap(bg,
+        index="ANNEE",
+        vSize ="TYPE_MVT",
+        type="index")
+
+
+### reemap des motif sortie
+
+motif=baseetudrec%>%   ## départ par motif
+  group_by(MOTIF)%>%
+  count(MOTIF)%>%
+  rename(DEPART_PAR_MOTIF_SORTIE=n)
+
+treemap(motif,
+        index="MOTIF",
+        vSize ="DEPART_PAR_MOTIF_SORTIE",
+        type="index")
+
+?treemap
+
+
+
+
+
+#################################""Analyser des variables les variables quantitatifs #################
+
+min(baseetudrec$AGE_ANNEE)
+max(baseetudrec$AGE_ANNEE)
+mean(baseetudrec$AGE_ANNEE)
+median(baseetudrec$AGE_ANNEE)
+range(baseetudrec$AGE_ANNEE)
+
+max(baseetudrec$AGE_ANNEE) - min(baseetudrec$AGE_ANNEE)
+var(baseetudrec$AGE_ANNEE)
+
+quantile(baseetudrec$AGE_ANNEE,prob=0.25) ## PREMIER QUANTILE
+quantile(baseetudrec$AGE_ANNEE,prob=0.75) ## TROISIEME QUANTILE
+
+summary(baseetudrec$AGE_ANNEE)
+
+hist(baseetudrec$AGE_ANNEE)
+
+hist(baseetudrec$AGE_ANNEE,breaks = 50) ## permets d'avoir 50 découpage
+
+hist(baseetudrec$AGE_ANNEE,col="skyblue",
+     main="Répartion de l'age ",
+     xlab="Age",
+     ylab="Effectif"
+    )
+
+#### ### exporter les données
+
+write.table(baseetudrec,"nom_base.csv",sep=";")
+
+
+
+
+## pie=ggplot(df,aes(x=DEPART,y=FREQUENCE,fill =factor(class))) +
+##geom_bar(stat = "identity") +
+ # coord_polar(theta ="y",start =0)
+
+#pie
