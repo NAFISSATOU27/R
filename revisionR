@@ -6,6 +6,11 @@ install.packages("read_excel")
 install.packages("dplyr")
 getwd()
 
+## openclassroom
+ozone <- read.table("ozone.csv",sep=";",header=TRUE)#dec=",", row.names=1)
+sort(df[1:20,1], decreasing=T)
+
+
 
 read_excel("Rectorat.xlsx")
 
@@ -45,12 +50,13 @@ baseetudrec$D_FIN_CTT=as.Date(baseetudrec$D_FIN_CTT,"%d/%m/%Y")
 
 ##### ## y'a t'il des valeurs manquantes
 any(is.na(baseetudrec)) 
+which(is.na(ozR),arr.ind=TRUE)
 
 # pour voir les variables ou se trouvent les valeurs manquantes
 summary (baseetudrec) 
 
 ## ou se trouve les données manquantes
-which(is.na(baseetudrec)) 
+which(is.na(baseetudrec),arr.ind=TRUE) ## arr.ind= indice array pour inditifier les indives de colonnes et de ligne
 
 ## si je voulais les supprimer baseetudrect %>% filter(!is.na(baseetudrec))
 
